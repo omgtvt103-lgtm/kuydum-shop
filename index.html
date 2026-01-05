@@ -1,182 +1,136 @@
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KUYDUMSHOP - OFFICIAL</title>
+    <title>KUYDUMSHOP - Stable Version</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700;900&display=swap');
-        
         body { 
             font-family: 'Kanit', sans-serif; 
             background-color: #020617;
-            background-image: radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.4) 0, transparent 50%), 
-                              radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.4) 0, transparent 50%);
             color: #f0f6fc; 
             min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
         }
-
-        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); }
-        
-        #auth {
-            background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('https://i.ibb.co/XZBYLxQ3/ssstik-io-1743696652535.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-
-        .balance-badge {
-            background: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #34d399;
-            padding: 4px 14px;
-            border-radius: 12px;
-            font-weight: 800;
-        }
-
-        /* ปุ่มแก้ไขแบบเดิม - ปรับให้กดง่ายขึ้น */
+        .glass { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
         .btn-edit-admin {
-            position: absolute; top: 12px; right: 12px; width: 42px; height: 42px;
-            background: #f59e0b; color: white; border-radius: 12px;
+            position: absolute; top: 10px; right: 10px; width: 35px; height: 35px;
+            background: #f59e0b; color: white; border-radius: 10px;
             display: none; align-items: center; justify-content: center;
-            z-index: 60; cursor: pointer; border: 2px solid rgba(255,255,255,0.4);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 40; cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .btn-edit-admin:hover { transform: scale(1.15); background: #fbbf24; }
-        .btn-edit-admin:active { transform: scale(0.9); }
         .is-admin .btn-edit-admin { display: flex; }
-
         #nav-dropdown {
-            position: absolute; top: 75px; right: 20px; width: 230px;
-            background: #0f172a; border-radius: 20px; padding: 8px;
-            display: none; z-index: 1000;
-            border: 1px solid rgba(255,255,255,0.1);
+            position: absolute; top: 70px; right: 20px; width: 220px;
+            background: #0f172a; border-radius: 15px; padding: 5px;
+            display: none; z-index: 1000; border: 1px solid rgba(255,255,255,0.1);
         }
         #nav-dropdown.active { display: block; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- Loader -->
-    <div id="loader" class="fixed inset-0 bg-[#020617] z-[9999] flex items-center justify-center font-bold text-sky-500 text-xl italic uppercase tracking-widest">
-        <span>กำลังเตรียมระบบ...</span>
+    <!-- Loading Screen -->
+    <div id="loader" class="fixed inset-0 bg-[#020617] z-[9999] flex flex-col items-center justify-center">
+        <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-sky-500 font-bold animate-pulse">กำลังโหลดระบบ...</p>
     </div>
 
-    <!-- MAIN APP -->
-    <div id="app" class="hidden min-h-screen">
-        <nav class="glass sticky top-0 z-[500] px-6 py-4 flex justify-between items-center border-b border-white/5">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="view('shop')">
-                <div class="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center shadow-lg shadow-sky-600/30">
-                    <i class="fas fa-bolt text-white"></i>
+    <div id="app" class="hidden">
+        <!-- Navigation -->
+        <nav class="glass sticky top-0 z-[500] px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="view('shop')">
+                <div class="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-bolt text-white text-sm"></i>
                 </div>
-                <h1 class="text-2xl font-black italic tracking-tighter uppercase">KUYDUM<span class="text-sky-500 text-3xl">SHOP</span></h1>
+                <h1 class="text-xl font-black italic uppercase tracking-tighter">KUYDUM<span class="text-sky-500">SHOP</span></h1>
             </div>
 
-            <div class="flex items-center gap-4">
-                <div class="flex flex-col items-end mr-1">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" id="u-name">...</span>
-                    <div class="balance-badge">
-                        <span>฿<span id="u-bal">0</span></span>
-                    </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <p class="text-[10px] text-slate-400 font-bold" id="u-name">User</p>
+                    <p class="text-emerald-400 font-black text-sm">฿<span id="u-bal">0</span></p>
                 </div>
-                <button onclick="toggleMenu(event)" class="w-11 h-11 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 active:scale-90 transition">
-                    <i class="fas fa-bars-staggered"></i>
+                <button onclick="toggleMenu(event)" class="p-2 hover:bg-white/5 rounded-lg transition">
+                    <i class="fas fa-bars"></i>
                 </button>
             </div>
 
-            <div id="nav-dropdown">
-                <button onclick="view('shop')" class="w-full text-left p-4 rounded-xl hover:bg-white/5 flex items-center gap-4 text-sm font-bold"><i class="fas fa-store text-sky-500"></i> หน้าร้านค้า</button>
-                <button onclick="view('inventory')" class="w-full text-left p-4 rounded-xl hover:bg-white/5 flex items-center gap-4 text-sm font-bold"><i class="fas fa-vault text-emerald-500"></i> คลังของฉัน</button>
-                <button onclick="view('topup')" class="w-full text-left p-4 rounded-xl hover:bg-white/5 flex items-center gap-4 text-sm font-bold"><i class="fas fa-coins text-yellow-500"></i> เติมเงิน</button>
-                <button id="admin-nav" onclick="view('admin')" class="hidden w-full text-left p-4 rounded-xl hover:bg-orange-500/10 flex items-center gap-4 text-sm text-orange-500 font-black"><i class="fas fa-shield-halved"></i> แผงแอดมิน</button>
-                <hr class="my-2 border-white/10">
-                <button onclick="doLogout()" class="w-full text-left p-4 rounded-xl hover:bg-red-500/10 text-red-500 flex items-center gap-4 text-sm font-bold"><i class="fas fa-power-off"></i> ออกจากระบบ</button>
+            <div id="nav-dropdown" class="glass shadow-2xl">
+                <button onclick="view('shop')" class="w-full text-left p-3 rounded-lg hover:bg-white/5 flex items-center gap-3 text-sm font-bold"><i class="fas fa-store text-sky-500"></i> หน้าแรก</button>
+                <button onclick="view('inventory')" class="w-full text-left p-3 rounded-lg hover:bg-white/5 flex items-center gap-3 text-sm font-bold"><i class="fas fa-box text-emerald-500"></i> ของที่ซื้อแล้ว</button>
+                <button onclick="view('topup')" class="w-full text-left p-3 rounded-lg hover:bg-white/5 flex items-center gap-3 text-sm font-bold"><i class="fas fa-wallet text-yellow-500"></i> เติมเงิน</button>
+                <button id="admin-nav" onclick="view('admin')" class="hidden w-full text-left p-3 rounded-lg hover:bg-orange-500/10 flex items-center gap-3 text-sm text-orange-500 font-black border-t border-white/5 mt-1 pt-3"><i class="fas fa-user-shield"></i> แอดมิน</button>
+                <button onclick="doLogout()" class="w-full text-left p-3 rounded-lg hover:bg-red-500/10 text-red-500 flex items-center gap-3 text-sm font-bold mt-1"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
             </div>
         </nav>
 
-        <main class="max-w-[1500px] mx-auto p-6 lg:p-10">
-            <!-- SHOP VIEW -->
+        <main class="p-4 md:p-8 max-w-7xl mx-auto">
+            <!-- SHOP -->
             <section id="v-shop" class="view-panel">
-                <h2 class="text-4xl font-black italic mb-10 uppercase tracking-tighter">Market <span class="text-sky-500">Place</span></h2>
-                <div id="shop-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-6"></div>
+                <h2 class="text-2xl font-black mb-6 uppercase">สินค้าทั้งหมด</h2>
+                <div id="shop-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
             </section>
 
-            <!-- INVENTORY VIEW -->
+            <!-- INVENTORY -->
             <section id="v-inventory" class="view-panel hidden">
-                <h2 class="text-4xl font-black italic mb-10 uppercase tracking-tighter text-emerald-500">My Vault</h2>
-                <div id="inv-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+                <h2 class="text-2xl font-black mb-6 uppercase text-emerald-500">คลังส่วนตัว</h2>
+                <div id="inv-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
             </section>
 
-            <!-- TOPUP VIEW -->
-            <section id="v-topup" class="view-panel hidden max-w-lg mx-auto">
-                <div class="glass p-12 rounded-[3rem] text-center shadow-2xl">
-                    <h3 class="text-3xl font-black mb-8 uppercase italic">แจ้งเติมเงิน</h3>
-                    <div class="space-y-4 text-left">
-                        <input id="t-amt" type="number" placeholder="จำนวนเงิน" class="w-full bg-black/40 p-6 rounded-3xl border border-white/10 text-center text-white text-4xl font-black outline-none focus:border-yellow-500">
-                        <input id="t-note" placeholder="บันทึกช่วยจำ / เวลา" class="w-full bg-black/40 p-5 rounded-2xl border border-white/10 text-white outline-none">
-                        <button onclick="submitTopup()" class="w-full bg-sky-600 py-6 rounded-[2rem] font-black text-xl text-white shadow-2xl active:scale-95 transition-all">ส่งข้อมูล</button>
-                    </div>
+            <!-- TOPUP -->
+            <section id="v-topup" class="view-panel hidden max-w-md mx-auto">
+                <div class="glass p-8 rounded-3xl text-center">
+                    <h3 class="text-xl font-black mb-6">แจ้งเติมเงิน</h3>
+                    <input id="t-amt" type="number" placeholder="จำนวนเงิน" class="w-full bg-black/50 p-4 rounded-xl border border-white/10 mb-4 outline-none text-center text-2xl font-bold">
+                    <input id="t-note" placeholder="เวลาโอน/หมายเหตุ" class="w-full bg-black/50 p-4 rounded-xl border border-white/10 mb-6 outline-none">
+                    <button onclick="submitTopup()" class="w-full bg-sky-600 py-4 rounded-xl font-bold hover:bg-sky-500 transition">ส่งข้อมูล</button>
                 </div>
             </section>
 
-            <!-- ADMIN VIEW (แก้ไขสต็อก) -->
-            <section id="v-admin" class="view-panel hidden space-y-12">
-                <div class="glass p-10 rounded-[3.5rem] border-orange-500/20 max-w-3xl mx-auto relative overflow-hidden shadow-2xl">
-                    <h3 id="adm-title" class="text-3xl font-black text-orange-500 mb-8 uppercase italic flex items-center gap-3">
-                        <i class="fas fa-edit"></i> จัดการสต็อกสินค้า
-                    </h3>
+            <!-- ADMIN -->
+            <section id="v-admin" class="view-panel hidden">
+                <div class="glass p-8 rounded-3xl max-w-2xl mx-auto">
+                    <h3 id="adm-title" class="text-xl font-black text-orange-500 mb-6 uppercase">จัดการสต็อก</h3>
                     <input id="p-id" type="hidden">
-                    <div class="space-y-5">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">ชื่อสินค้า</label>
-                                <input id="p-name" placeholder="ชื่อสินค้า..." class="w-full bg-black/40 p-5 rounded-2xl border border-white/10 text-white outline-none focus:border-orange-500">
-                            </div>
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">ราคา (บาท)</label>
-                                <input id="p-price" type="number" placeholder="0" class="w-full bg-black/40 p-5 rounded-2xl border border-white/10 text-white outline-none focus:border-orange-500">
-                            </div>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">ลิงก์รูปภาพ</label>
-                            <input id="p-img" placeholder="https://..." class="w-full bg-black/40 p-5 rounded-2xl border border-white/10 text-white outline-none focus:border-orange-500">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">เติมรหัสสต็อกใหม่ (1 บรรทัดต่อ 1 คีย์)</label>
-                            <textarea id="p-keys" placeholder="ใส่รหัสที่นี่..." rows="6" class="w-full bg-black/40 p-6 rounded-3xl border border-white/10 text-white font-mono text-sm outline-none focus:border-orange-500"></textarea>
-                        </div>
-                        <div class="flex gap-4 pt-4">
-                            <button id="btn-save" onclick="saveProduct()" class="flex-1 bg-orange-600 hover:bg-orange-500 py-5 rounded-2xl font-black text-xl text-white shadow-xl active:scale-95 transition-all">บันทึกข้อมูลสินค้า</button>
-                            <button onclick="clearAdminForm()" class="px-8 bg-slate-800 rounded-2xl font-bold hover:bg-slate-700 transition">ล้างค่า</button>
-                        </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <input id="p-name" placeholder="ชื่อสินค้า" class="bg-black/50 p-4 rounded-xl border border-white/10 outline-none">
+                        <input id="p-price" type="number" placeholder="ราคา" class="bg-black/50 p-4 rounded-xl border border-white/10 outline-none">
+                    </div>
+                    <input id="p-img" placeholder="ลิงก์รูปภาพ" class="w-full bg-black/50 p-4 rounded-xl border border-white/10 mb-4 outline-none">
+                    <textarea id="p-keys" placeholder="ใส่รหัส (1 บรรทัด = 1 คีย์)" rows="5" class="w-full bg-black/50 p-4 rounded-xl border border-white/10 mb-6 outline-none font-mono text-sm"></textarea>
+                    <div class="flex gap-2">
+                        <button onclick="saveProduct()" class="flex-1 bg-orange-600 py-4 rounded-xl font-bold hover:bg-orange-500 transition">บันทึกข้อมูล</button>
+                        <button onclick="clearAdminForm()" class="px-6 bg-slate-700 rounded-xl">ล้าง</button>
                     </div>
                 </div>
-                <!-- รายการเติมเงิน -->
-                <div id="adm-topups" class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+                <div id="adm-topups" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </section>
         </main>
     </div>
 
-    <!-- AUTH SECTION -->
-    <div id="auth" class="hidden min-h-screen flex items-center justify-center p-6">
-        <div class="w-full max-w-sm glass p-10 rounded-[3.5rem] text-center border-white/10 shadow-2xl">
-            <h2 class="text-4xl font-black italic text-white mb-10 uppercase tracking-tighter">KUYDUM<span class="text-sky-500">SHOP</span></h2>
+    <!-- AUTH -->
+    <div id="auth" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-sm glass p-10 rounded-[2.5rem] text-center">
+            <h2 class="text-3xl font-black italic mb-8 uppercase">KUYDUM<span class="text-sky-500">SHOP</span></h2>
             <div id="f-login" class="space-y-4">
-                <input id="l-email" placeholder="Email" class="w-full p-5 rounded-2xl bg-black/80 border border-white/10 text-white outline-none">
-                <input id="l-pass" type="password" placeholder="Password" class="w-full p-5 rounded-2xl bg-black/80 border border-white/10 text-white outline-none">
-                <button onclick="handleLogin()" class="w-full bg-sky-600 py-5 rounded-2xl font-black text-xl text-white active:scale-95 transition-all">เข้าสู่ระบบ</button>
-                <p onclick="toggleAuth()" class="text-xs text-slate-400 cursor-pointer pt-6 font-bold uppercase tracking-widest hover:text-sky-500">สมัครสมาชิก</p>
+                <input id="l-email" placeholder="อีเมล" class="w-full p-4 rounded-xl bg-black/50 border border-white/10 outline-none">
+                <input id="l-pass" type="password" placeholder="รหัสผ่าน" class="w-full p-4 rounded-xl bg-black/50 border border-white/10 outline-none">
+                <button onclick="handleLogin()" class="w-full bg-sky-600 py-4 rounded-xl font-bold">เข้าสู่ระบบ</button>
+                <p onclick="toggleAuth()" class="text-xs text-slate-400 cursor-pointer pt-4 uppercase hover:text-sky-500">สมัครสมาชิกที่นี่</p>
             </div>
             <div id="f-reg" class="hidden space-y-4">
-                <input id="r-name" placeholder="ชื่อเล่น" class="w-full p-5 rounded-2xl bg-black/80 border border-white/10 text-white outline-none">
-                <input id="r-email" placeholder="Email" class="w-full p-5 rounded-2xl bg-black/80 border border-white/10 text-white outline-none">
-                <input id="r-pass" type="password" placeholder="Password" class="w-full p-5 rounded-2xl bg-black/80 border border-white/10 text-white outline-none">
-                <button onclick="handleReg()" class="w-full bg-emerald-600 py-5 rounded-2xl font-black text-xl text-white active:scale-95 transition-all">สมัครสมาชิก</button>
-                <p onclick="toggleAuth()" class="text-xs text-slate-400 cursor-pointer pt-6 font-bold uppercase tracking-widest hover:text-emerald-500">ย้อนกลับ</p>
+                <input id="r-name" placeholder="ชื่อเล่น" class="w-full p-4 rounded-xl bg-black/50 border border-white/10 outline-none">
+                <input id="r-email" placeholder="อีเมล" class="w-full p-4 rounded-xl bg-black/50 border border-white/10 outline-none">
+                <input id="r-pass" type="password" placeholder="รหัสผ่าน" class="w-full p-4 rounded-xl bg-black/50 border border-white/10 outline-none">
+                <button onclick="handleReg()" class="w-full bg-emerald-600 py-4 rounded-xl font-bold">ยืนยันการสมัคร</button>
+                <p onclick="toggleAuth()" class="text-xs text-slate-400 cursor-pointer pt-4 uppercase hover:text-emerald-500">กลับไปล็อกอิน</p>
             </div>
         </div>
     </div>
@@ -198,133 +152,197 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        let currentUser = null;
+        let userProfile = null;
 
-        window.toggleMenu = (e) => { 
-            e.stopPropagation(); 
-            document.getElementById('nav-dropdown').classList.toggle('active'); 
-        };
-        
-        document.addEventListener('click', () => {
-            document.getElementById('nav-dropdown').classList.remove('active');
-        });
-
-        window.view = (v) => {
-            document.querySelectorAll('.view-panel').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`v-${v}`).classList.remove('hidden');
-            window.scrollTo(0, 0);
-        };
-
+        // UI Helpers
+        window.toggleMenu = (e) => { e.stopPropagation(); document.getElementById('nav-dropdown').classList.toggle('active'); };
+        document.addEventListener('click', () => document.getElementById('nav-dropdown')?.classList.remove('active'));
         window.toggleAuth = () => {
             document.getElementById('f-login').classList.toggle('hidden');
             document.getElementById('f-reg').classList.toggle('hidden');
         };
+        window.view = (v) => {
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`v-${v}`);
+            if(target) target.classList.remove('hidden');
+        };
 
+        // Auth Logic
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
             if (user) {
                 document.getElementById('auth').classList.add('hidden');
                 document.getElementById('app').classList.remove('hidden');
-                loadUserData(user.uid);
+                initShop(user.uid);
             } else {
                 document.getElementById('auth').classList.remove('hidden');
                 document.getElementById('app').classList.add('hidden');
             }
         });
 
-        function loadUserData(uid) {
+        async function initShop(uid) {
+            // User Data
             onSnapshot(doc(db, "users", uid), (s) => {
-                if (s.exists()) {
-                    currentUser = s.data();
-                    document.getElementById('u-name').innerText = currentUser.username;
-                    document.getElementById('u-bal').innerText = currentUser.balance.toLocaleString();
-                    
-                    const isAdmin = currentUser.role === 'admin';
+                if(s.exists()) {
+                    userProfile = s.data();
+                    document.getElementById('u-name').innerText = userProfile.username;
+                    document.getElementById('u-bal').innerText = userProfile.balance.toLocaleString();
+                    const isAdmin = userProfile.role === 'admin';
                     document.getElementById('admin-nav').classList.toggle('hidden', !isAdmin);
                     document.body.classList.toggle('is-admin', isAdmin);
-                    if(isAdmin) loadAdminTools();
+                    if(isAdmin) loadAdminData();
                 }
             });
 
-            // Load Products
+            // Products
             onSnapshot(collection(db, "products"), (snap) => {
                 const grid = document.getElementById('shop-grid');
                 grid.innerHTML = "";
                 snap.forEach(d => {
                     const p = d.data();
-                    const stock = p.keys?.length || 0;
                     const card = document.createElement('div');
-                    card.className = "glass p-4 rounded-[2.5rem] relative overflow-hidden product-card";
+                    card.className = "glass p-3 rounded-2xl relative overflow-hidden";
                     
-                    // ปุ่มแก้ไขสีส้ม (สำหรับ Admin เท่านั้น)
-                    if(currentUser?.role === 'admin') {
-                        const btnEdit = document.createElement('div');
-                        btnEdit.className = "btn-edit-admin";
-                        btnEdit.innerHTML = `<i class="fas fa-wrench"></i>`;
-                        btnEdit.onclick = (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            startEdit(d.id);
-                        };
-                        card.appendChild(btnEdit);
+                    if(userProfile?.role === 'admin') {
+                        const eb = document.createElement('div');
+                        eb.className = "btn-edit-admin";
+                        eb.innerHTML = '<i class="fas fa-cog"></i>';
+                        eb.onclick = (e) => { e.stopPropagation(); editProduct(d.id); };
+                        card.appendChild(eb);
                     }
 
                     card.innerHTML += `
-                        <div class="aspect-square rounded-[1.8rem] mb-4 bg-slate-900 overflow-hidden">
-                            <img src="${p.image || 'https://via.placeholder.com/300'}" class="w-full h-full object-cover">
-                        </div>
-                        <h4 class="text-sm font-black truncate text-white uppercase italic px-1">${p.name}</h4>
-                        <div class="flex justify-between items-center mt-4 px-1">
-                            <span class="text-xl font-black text-sky-400 font-mono">฿${p.price}</span>
-                            <button onclick="buy(event, '${d.id}', ${p.price})" class="bg-sky-600 hover:bg-sky-500 px-5 py-2.5 rounded-2xl text-[11px] font-black text-white ${stock === 0 ? 'opacity-20 pointer-events-none' : 'active:scale-95'} transition-all shadow-lg shadow-sky-600/20">
-                                BUY (${stock})
-                            </button>
+                        <img src="${p.image || 'https://via.placeholder.com/150'}" class="w-full aspect-square object-cover rounded-xl mb-3">
+                        <p class="text-xs font-bold truncate px-1 uppercase">${p.name}</p>
+                        <div class="flex justify-between items-center mt-3">
+                            <span class="text-sky-400 font-bold">฿${p.price}</span>
+                            <button onclick="buyProduct('${d.id}', ${p.price})" class="bg-sky-600 px-3 py-1.5 rounded-lg text-[10px] font-bold">BUY (${p.keys?.length || 0})</button>
                         </div>
                     `;
                     grid.appendChild(card);
                 });
             });
 
-            // Load Inventory
+            // Inventory
             onSnapshot(query(collection(db, "inventory"), where("uid", "==", uid)), (snap) => {
                 const grid = document.getElementById('inv-grid');
-                grid.innerHTML = snap.empty ? `<div class="col-span-full py-10 text-center opacity-30 italic">ยังไม่มีสินค้าในครอบครอง</div>` : "";
+                grid.innerHTML = "";
                 snap.forEach(d => {
                     const i = d.data();
                     const el = document.createElement('div');
-                    el.className = "glass p-6 rounded-3xl flex justify-between items-center border-l-4 border-emerald-500 shadow-xl";
-                    el.innerHTML = `
-                        <div class="text-left">
-                            <p class="font-black text-white text-md uppercase italic leading-none">${i.pName}</p>
-                            <p class="text-[9px] text-slate-500 mt-2 font-bold uppercase">${i.date}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <code class="bg-black/60 px-4 py-2 rounded-xl text-emerald-400 text-xs font-mono border border-white/5">${i.key}</code>
-                            <button onclick="copyClip('${i.key}')" class="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-emerald-500/20 rounded-xl transition-all"><i class="fas fa-copy text-slate-400"></i></button>
-                        </div>
-                    `;
+                    el.className = "glass p-4 rounded-xl flex justify-between items-center";
+                    el.innerHTML = `<div><p class="font-bold text-sm">${i.pName}</p><p class="text-[9px] text-slate-500">${i.date}</p></div><code class="text-emerald-400 text-xs">${i.key}</code>`;
                     grid.appendChild(el);
                 });
             });
         }
 
-        // --- ADMIN FUNCTIONS ---
-        window.startEdit = async (id) => {
+        window.editProduct = async (id) => {
+            const s = await getDoc(doc(db, "products", id));
+            if(s.exists()){
+                const d = s.data();
+                document.getElementById('p-id').value = id;
+                document.getElementById('p-name').value = d.name;
+                document.getElementById('p-price').value = d.price;
+                document.getElementById('p-img').value = d.image || "";
+                document.getElementById('p-keys').value = "";
+                document.getElementById('adm-title').innerText = "แก้ไข: " + d.name;
+                view('admin');
+            }
+        };
+
+        window.saveProduct = async () => {
+            const id = document.getElementById('p-id').value;
+            const name = document.getElementById('p-name').value;
+            const price = parseInt(document.getElementById('p-price').value);
+            const img = document.getElementById('p-img').value;
+            const keys = document.getElementById('p-keys').value.split('\n').filter(k => k.trim());
+
+            if(!name || isNaN(price)) return alert("ใส่ข้อมูลไม่ครบ");
+
             try {
-                const s = await getDoc(doc(db, "products", id));
-                if (s.exists()) {
-                    const d = s.data();
-                    document.getElementById('p-id').value = id;
-                    document.getElementById('p-name').value = d.name;
-                    document.getElementById('p-price').value = d.price;
-                    document.getElementById('p-img').value = d.image || "";
-                    document.getElementById('p-keys').value = ""; // เคลียร์ช่องใส่คีย์เพื่อให้เติมใหม่
-                    
-                    document.getElementById('adm-title').innerHTML = `<i class="fas fa-edit"></i> กำลังแก้ไข: ${d.name}`;
-                    document.getElementById('btn-save').innerText = "อัปเดต/เติมสต็อก";
-                    
-                    // เปลี่ยนหน้าไปที่หน้าแอดมินทันที
-                    view('admin');
+                if(id) {
+                    const s = await getDoc(doc(db, "products", id));
+                    const oldKeys = s.data().keys || [];
+                    await updateDoc(doc(db, "products", id), { name, price, image: img, keys: [...oldKeys, ...keys] });
+                } else {
+                    await addDoc(collection(db, "products"), { name, price, image: img, keys });
                 }
-            } catch(e) { console.error("Edit error:", e); }
+                clearAdminForm();
+                view('shop');
+                alert("สำเร็จ!");
+            } catch(e) { alert("ล้มเหลว"); }
+        };
+
+        window.clearAdminForm = () => {
+            document.getElementById('p-id').value = "";
+            document.getElementById('p-name').value = "";
+            document.getElementById('p-price').value = "";
+            document.getElementById('p-img').value = "";
+            document.getElementById('p-keys').value = "";
+            document.getElementById('adm-title').innerText = "จัดการสต็อก";
+        };
+
+        window.buyProduct = async (pid, price) => {
+            if(userProfile.balance < price) return alert("เงินไม่พอ");
+            const ref = doc(db, "products", pid);
+            const s = await getDoc(ref);
+            const p = s.data();
+            if(!p.keys?.length) return alert("ของหมด");
+
+            const key = p.keys.shift();
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), { balance: increment(-price) });
+                await updateDoc(ref, { keys: p.keys });
+                await addDoc(collection(db, "inventory"), { uid: auth.currentUser.uid, pName: p.name, key, date: new Date().toLocaleString() });
+                alert("ซื้อสำเร็จ!");
+            } catch(e) { alert("ระบบขัดข้อง"); }
+        };
+
+        window.submitTopup = async () => {
+            const amt = parseInt(document.getElementById('t-amt').value);
+            if(!amt) return;
+            await addDoc(collection(db, "topups"), { uid: auth.currentUser.uid, email: userProfile.email, amount: amt, note: document.getElementById('t-note').value, status: 'pending' });
+            alert("ส่งข้อมูลแล้ว");
+            view('shop');
+        };
+
+        function loadAdminData() {
+            onSnapshot(collection(db, "topups"), (snap) => {
+                const div = document.getElementById('adm-topups');
+                div.innerHTML = "";
+                snap.forEach(d => {
+                    const t = d.data();
+                    const el = document.createElement('div');
+                    el.className = "glass p-4 rounded-xl flex justify-between items-center";
+                    el.innerHTML = `<div><p class="font-bold text-emerald-400">฿${t.amount}</p><p class="text-[9px]">${t.email}</p></div><button onclick="approveT('${d.id}','${t.uid}',${t.amount})" class="bg-emerald-600 px-4 py-2 rounded-lg text-xs font-bold">อนุมัติ</button>`;
+                    div.appendChild(el);
+                });
+            });
         }
+
+        window.approveT = async (id, uid, amt) => {
+            await updateDoc(doc(db, "users", uid), { balance: increment(amt) });
+            await deleteDoc(doc(db, "topups", id));
+        };
+
+        window.handleLogin = async () => {
+            try { await signInWithEmailAndPassword(auth, document.getElementById('l-email').value, document.getElementById('l-pass').value); }
+            catch(e) { alert("อีเมลหรือรหัสผ่านผิด"); }
+        };
+
+        window.handleReg = async () => {
+            const n = document.getElementById('r-name').value, e = document.getElementById('r-email').value, p = document.getElementById('r-pass').value;
+            try {
+                const c = await createUserWithEmailAndPassword(auth, e, p);
+                const all = await getDocs(collection(db, "users"));
+                await setDoc(doc(db, "users", c.user.uid), { username: n, email: e, balance: 0, role: all.size === 0 ? 'admin' : 'user' });
+            } catch(e) { alert("สมัครไม่สำเร็จ"); }
+        };
+
+        window.doLogout = () => signOut(auth);
+    </script>
+</body>
+</html>
+
+    
