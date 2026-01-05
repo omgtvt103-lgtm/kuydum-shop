@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KuyDumSHOP - Premium Digital Keys</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700;900&display=swap');
+        body { font-family: 'Kanit', sans-serif; background: #0b0f1a; color: white; margin: 0; }
+        .glass { background: rgba(22, 30, 45, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .admin-tag { background: linear-gradient(135deg, #f59e0b, #ea580c); box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+        .product-card { background: #161e2d; border: 1px solid rgba(255,255,255,0.03); transition: all 0.3s ease; }
+        .product-card:hover { transform: translateY(-5px); border-color: #0ea5e9; }
+    </style>
+</head>
+<body>
+    <div id="loading" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0b0f1a]">
+        <div class="w-12 h-12 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
+        <h2 class="mt-4 text-xl font-black italic tracking-widest animate-pulse">KUYDUM<span class="text-sky-500">SHOP</span></h2>
+    </div>
+
+    <div id="auth-screen" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-[#161e2d] rounded-[2rem] p-8 shadow-2xl border border-white/5 text-center">
+            <h1 class="text-4xl font-black italic mb-8 uppercase">KUYDUM<span class="text-sky-500">SHOP</span></h1>
+            <div id="login-form" class="space-y-4">
+                <input id="l-email" type="email" placeholder="อีเมล" class="w-full bg-black/30 p-4 rounded-xl border border-white/5 outline-none focus:border-sky-500 text-white">
+                <input id="l-pass" type="password" placeholder="รหัสผ่าน" class="w-full bg-black/30 p-4 rounded-xl border border-white/5 outline-none focus:border-sky-500 text-white">
+                <button id="btn-login" class="w-full bg-sky-500 hover:bg-sky-600 py-4 rounded-xl font-bold transition-all active:scale-95">เข้าสู่ระบบ</button>
+                <button onclick="toggleAuth(false)" class="w-full text-slate-400 text-sm">สมัครสมาชิกใหม่</button>
+            </div>
+            <div id="reg-form" class="hidden space-y-4">
+                <input id="r-user" type="text" placeholder="ชื่อเล่น" class="w-full bg-black/30 p-4 rounded-xl border border-white/5 outline-none focus:border-green-500 text-white">
+                <input id="r-email" type="email" placeholder="อีเมล" class="w-full bg-black/30 p-4 rounded-xl border border-white/5 outline-none focus:border-green-500 text-white">
+                <input id="r-pass" type="password" placeholder="รหัสผ่าน (6 ตัวขึ้นไป)" class="w-full bg-black/30 p-4 rounded-xl border border-white/5 outline-none focus:border-green-500 text-white">
+                <button id="btn-reg" class="w-full bg-green-500 hover:bg-green-600 py-4 rounded-xl font-bold text-white">ยืนยันการสมัคร</button>
+                <button onclick="toggleAuth(true)" class="w-full text-slate-400 text-sm">กลับไปหน้าล็อกอิน</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-content" class="hidden">
+        <nav class="glass sticky top-0 z-50 px-6 py-4">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-black italic uppercase">KUYDUM<span class="text-sky-500">SHOP</span></h1>
+                    <div id="admin-badge" class="hidden admin-tag px-3 py-1 rounded-full text-[10px] font-bold uppercase">ADMIN</div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-sky-500/10 border border-sky-500/20 px-4 py-2 rounded-xl flex flex-col items-center">
+                        <span class="text-[10px] text-slate-400 uppercase mb-1">ยอดเงิน</span>
+                        <span class="font-bold text-sky-400 text-lg leading-none">฿<span id="bal-display">0</span></span>
+                    </div>
+                    <button id="btn-logout" class="text-slate-400 hover:text-red-500"><i class="fas fa-sign-out-alt text-xl"></i></button>
+                </div>
+            </div>
+        </nav>
+        <main class="max-w-6xl mx-auto p-6">
+            <h2 class="text-3xl font-bold mb-6">สินค้าทั้งหมด</h2>
+            <div id="product-list" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBC0pg-gWH0kYX2paCmO_LCIWKiUISDarU",
+            authDomain: "mywed56.firebaseapp.com",
+            projectId: "mywed56",
+            storageBucket: "mywed56.firebasestorage.app",
+            messagingSenderId: "94954792072",
+            appId: "1:94954792072:web:cd3269324e2387fd00eb3d",
+            measurementId: "G-9JDB64CQDP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, (user) => {
+            document.getElementById('loading').style.display = 'none';
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('hidden');
+                listenUserData(user.uid);
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-content').classList.add('hidden');
+            }
+        });
+
+        function listenUserData(uid) {
+            onSnapshot(doc(db, "users", uid), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    document.getElementById('bal-display').innerText = data.balance.toLocaleString();
+                    if (data.role === 'admin') document.getElementById('admin-badge').classList.remove('hidden');
+                    renderProducts();
+                }
+            });
+        }
+
+        document.getElementById('btn-reg').onclick = async () => {
+            const user = document.getElementById('r-user').value.trim();
+            const email = document.getElementById('r-email').value.trim();
+            const pass = document.getElementById('r-pass').value;
+            try {
+                const q = query(collection(db, "users"), limit(1));
+                const qs = await getDocs(q);
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    username: user, email: email, balance: 0, role: qs.empty ? 'admin' : 'user'
+                });
+                alert("สมัครสำเร็จ");
+            } catch (e) { alert(e.message); }
+        };
+
+        document.getElementById('btn-login').onclick = async () => {
+            try { await signInWithEmailAndPassword(auth, document.getElementById('l-email').value, document.getElementById('l-pass').value); } 
+            catch (e) { alert("ล็อกอินไม่สำเร็จ"); }
+        };
+
+        document.getElementById('btn-logout').onclick = () => signOut(auth);
+        window.toggleAuth = (isLogin) => {
+            document.getElementById('login-form').classList.toggle('hidden', !isLogin);
+            document.getElementById('reg-form').classList.toggle('hidden', isLogin);
+        };
+
+        function renderProducts() {
+            const pds = [{n:"Key A", p:50}, {n:"Key B", p:100}, {n:"Key C", p:500}];
+            document.getElementById('product-list').innerHTML = pds.map(p => `
+                <div class="product-card p-6 rounded-3xl text-center">
+                    <h3 class="text-xl font-bold mb-4">${p.n}</h3>
+                    <p class="text-2xl font-black mb-4 text-sky-400">฿${p.p}</p>
+                    <button class="bg-sky-500 w-full py-2 rounded-xl font-bold">ซื้อเลย</button>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
